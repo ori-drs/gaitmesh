@@ -13,6 +13,32 @@
 #include <ros/package.h>
 #include <fstream>
 
+inline Eigen::Vector3d pcl2eig(const pcl::PointXYZRGBNormal& pt)
+{
+  return Eigen::Vector3d(pt.x, pt.y, pt.z);
+}
+
+inline pcl::PointXYZRGBNormal eig2pcl(const Eigen::Vector3d& vec)
+{
+  pcl::PointXYZRGBNormal pt;
+  pt.x = vec(0);
+  pt.y = vec(1);
+  pt.z = vec(2);
+  return pt;
+}
+
+inline bool pointsOnSameSideOfLine(const Eigen::Vector3d& p1, const Eigen::Vector3d& p2, const Eigen::Vector3d& a, const Eigen::Vector3d& b)
+{
+  Eigen::Vector3d n1 = (b-a).cross(p1-a);
+  Eigen::Vector3d n2 = (b-a).cross(p2-a);
+  return n1.dot(n2) >= 0;
+}
+
+inline bool pointInTriangle(const Eigen::Vector3d& p, const Eigen::Vector3d& a, const Eigen::Vector3d& b, const Eigen::Vector3d& c)
+{
+  return pointsOnSameSideOfLine(p,a,b,c) && pointsOnSameSideOfLine(p,b,a,c) && pointsOnSameSideOfLine(p,c,a,b);
+}
+
 bool saveAreas(const std::string& path, const std::vector<char>& labels)
 {
   std::ofstream FILE(path, std::ios::out | std::ofstream::binary);
@@ -34,6 +60,9 @@ int main(int argc, char* argv[])
 
   // parameters (input)
   bool input_clouds_not_mesh;
+  double radius_normals;
+  double radius_robot;
+  double mesh_sampling_resolution;
   std::string path_mesh;
   std::string path1;
   std::string path2;
@@ -41,6 +70,9 @@ int main(int argc, char* argv[])
   std::string path4;
   std::string path_cloud_mesh;
   nodeHandle.param("input_clouds_not_mesh", input_clouds_not_mesh, true);
+  nodeHandle.param("radius_normals", radius_normals, 0.20);
+  nodeHandle.param("radius_robot", radius_robot, 0.60);
+  nodeHandle.param("mesh_sampling_resolution", mesh_sampling_resolution, 0.05);
   nodeHandle.param("mesh", path_mesh, std::string(""));
   nodeHandle.param("cloud1", path1, std::string(""));
   nodeHandle.param("cloud2", path2, std::string(""));
@@ -84,8 +116,8 @@ int main(int argc, char* argv[])
     } else {
       // mesh reconstruction
       ROS_INFO("Reconstructing mesh (using lvr2_reconstruct)...");
-      const std::string cloud_output_file = ros::package::getPath("sim_environments") + "/data/annotate_cloud_gaits_cloud.ply";
-      const std::string mesh_output_file  = ros::package::getPath("sim_environments") + "/data/annotate_cloud_gaits_mesh.ply";
+      const std::string cloud_output_file = ros::package::getPath("gaitmesh_ros") + "/data/annotate_cloud_gaits_cloud.ply";
+      const std::string mesh_output_file  = ros::package::getPath("gaitmesh_ros") + "/data/annotate_cloud_gaits_mesh.ply";
       // save cloud to file
       pcl::io::savePLYFile (cloud_output_file, *step1);
       // run lvr2_reconstruct
@@ -101,7 +133,7 @@ int main(int argc, char* argv[])
     ROS_INFO("Loading mesh...");
     pcl::io::loadPolygonFileOBJ (path_mesh, mesh);
     ROS_INFO("Sampling mesh...");
-    step1 = getCloudFromMesh (mesh, 0.05);
+    step1 = getCloudFromMesh (mesh, mesh_sampling_resolution);
 
   }
 
@@ -122,7 +154,7 @@ int main(int argc, char* argv[])
   pcl::PointCloud<pcl::PointNormal>::Ptr step3 (new pcl::PointCloud<pcl::PointNormal>);
   {
     ROS_INFO("Estimating normals...");
-    const float radius = 0.20;
+    const float radius = radius_normals;
     pcl::NormalEstimationOMP<pcl::PointXYZ, pcl::Normal> ne;
     ne.setInputCloud (step2);
     pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ> ());
@@ -135,7 +167,7 @@ int main(int argc, char* argv[])
   pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr step4 (new pcl::PointCloud<pcl::PointXYZRGBNormal>);
   {
     ROS_INFO("Running filters...");
-    const float radius = 0.60;
+    const float radius = radius_robot;
     step4->points.reserve(step3->points.size());
     pcl::search::KdTree<pcl::PointNormal>::Ptr tree (new pcl::search::KdTree<pcl::PointNormal> ());
     tree->setInputCloud (step3);
@@ -171,7 +203,7 @@ int main(int argc, char* argv[])
 
   // back-project features to mesh
   std::vector<char> mesh_labels(mesh.polygons.size(), (char)0);
-  {
+  if (true) {
     ROS_INFO("Back-projecting annotations to mesh...");
     // tree
     pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGBNormal> ());
@@ -181,11 +213,14 @@ int main(int argc, char* argv[])
     pcl::fromPCLPointCloud2 (mesh.cloud, mesh_cloud);
     for (int i = 0; i < mesh.polygons.size(); i++) {
       // get closest annotated-cloud point
-      int id = mesh.polygons[i].vertices[0];
-      const pcl::PointXYZRGBNormal& pt = mesh_cloud.points[id];
+      Eigen::Vector3d v0 = pcl2eig( mesh_cloud.points[ mesh.polygons[i].vertices[0] ] );
+      Eigen::Vector3d v1 = pcl2eig( mesh_cloud.points[ mesh.polygons[i].vertices[1] ] );
+      Eigen::Vector3d v2 = pcl2eig( mesh_cloud.points[ mesh.polygons[i].vertices[2] ] );
+      Eigen::Vector3d vc = (v0+v1+v2) / 3;
+      pcl::PointXYZRGBNormal pt_center = eig2pcl(vc);
       std::vector<int> k_indices;
       std::vector<float> k_distances;
-      tree->nearestKSearch (pt, 1, k_indices, k_distances);
+      tree->nearestKSearch (pt_center, 1, k_indices, k_distances);
       // assign label to triangle
       const pcl::PointXYZRGBNormal& nn = step4->points[ k_indices[0] ];
       char label = 2;
@@ -197,12 +232,60 @@ int main(int argc, char* argv[])
         label = 0; // unwalkable
       mesh_labels[i] = label;
     }
+  } else {
+    ROS_INFO("Back-projecting annotations to mesh...");
+    // tree
+    pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGBNormal> ());
+    tree->setInputCloud (step4);
+    // go through all mesh triangles
+    pcl::PointCloud<pcl::PointXYZRGBNormal> mesh_cloud;
+    pcl::fromPCLPointCloud2 (mesh.cloud, mesh_cloud);
+    for (int i = 0; i < mesh.polygons.size(); i++) {
+      // we will vote for each of the gait-controller options
+      int votes_trot = 0;
+      int votes_step = 0;
+      // find all points around the triangle
+      Eigen::Vector3d v0 = pcl2eig( mesh_cloud.points[ mesh.polygons[i].vertices[0] ] );
+      Eigen::Vector3d v1 = pcl2eig( mesh_cloud.points[ mesh.polygons[i].vertices[1] ] );
+      Eigen::Vector3d v2 = pcl2eig( mesh_cloud.points[ mesh.polygons[i].vertices[2] ] );
+      Eigen::Vector3d vc = (v0+v1+v2) / 3;
+      Eigen::Vector3d normal = (v1-v0).cross(v2-v1).normalized();
+      pcl::PointXYZRGBNormal pt_center = eig2pcl(vc);
+      double dist0 = (v0-vc).norm();
+      double dist1 = (v1-vc).norm();
+      double dist2 = (v2-vc).norm();
+      double radius = std::max(std::max(dist0, dist1), dist2);
+      std::vector<int> k_indices;
+      std::vector<float> k_distances;
+      tree->radiusSearch (pt_center, radius, k_indices, k_distances);
+      for (unsigned int k = 0; k < k_indices.size(); k++) {
+        // check if point is inside triangle
+        const pcl::PointXYZRGBNormal& pt = step4->points[ k_indices[k] ];
+        Eigen::Vector3d v = pcl2eig(pt);
+        if ( fabs((v-vc).dot(normal)) > 0.10  ) // far from plane
+          continue;
+        if ( !pointInTriangle(v,v0,v1,v2) ) // outside triangle
+          continue;
+        // vote
+        if (pt.g > 0)
+          votes_trot++;
+        else if (pt.b > 0)
+          votes_step++;
+      }
+      // assign label to triangle
+      char label = 2;
+      if (votes_trot > votes_step)
+        label = 1; // trot
+      else
+        label = 2; // step
+      mesh_labels[i] = label;
+    }
   }
 
   // save annotated mesh
   if (true) {
-    const std::string mesh_output_file  = ros::package::getPath("sim_environments") + "/data/annotate_cloud_gaits_mesh.obj";
-    const std::string area_output_file  = ros::package::getPath("sim_environments") + "/data/annotate_cloud_gaits_mesh.dat";
+    const std::string mesh_output_file  = ros::package::getPath("gaitmesh_ros") + "/data/annotate_cloud_gaits_mesh.obj";
+    const std::string area_output_file  = ros::package::getPath("gaitmesh_ros") + "/data/annotate_cloud_gaits_mesh.dat";
     ROS_INFO("Saving mesh as OBJ...");
     pcl::io::saveOBJFile(mesh_output_file, mesh);
     ROS_INFO("Saving mesh annotations...");

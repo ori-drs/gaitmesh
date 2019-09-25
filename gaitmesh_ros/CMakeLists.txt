@@ -26,6 +26,12 @@ macro(use_cxx11)
 endmacro(use_cxx11)
 use_cxx11()
 
+# Point Cloud Library
+find_package(PCL 1.8 REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
@@ -142,7 +148,7 @@ include_directories(
 ## annotate_cloud_gaits
 add_executable(annotate_cloud_gaits src/annotate_cloud_gaits.cpp src/PclMeshSampling.cpp)
 add_dependencies(annotate_cloud_gaits ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(annotate_cloud_gaits ${catkin_LIBRARIES})
+target_link_libraries(annotate_cloud_gaits ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
 #############
 ## Install ##

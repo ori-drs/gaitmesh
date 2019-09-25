@@ -8,6 +8,14 @@
   <node pkg="gaitmesh_ros" type="annotate_cloud_gaits" name="annotate_cloud_gaits" output="screen">
     <param name="input_clouds_not_mesh" value="$(arg input_clouds_not_mesh)" />
 
+    <param name="radius_normals" value="0.20" />
+    <param name="radius_robot" value="0.60" />
+    <param name="mesh_sampling_resolution" value="0.10" />
+
+    <!-- example model from Barcelona Robot Lab Dataset -->
+
+    <param name="mesh" value="$(find gaitmesh_ros)/data/BRL_final.obj" />
+
     <!-- oil_rig model -->
 <!--
     <param name="mesh" value="$(find recast_demos)/data/oilRig_detailed.obj" />
@@ -30,11 +38,11 @@
     <param name="cloud_mesh" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/mesh-oilrig-container-merged-1cm-aligned-normals-ascii-filtered.obj" />
 -->
     <!-- FSC container1 and main -->
-
+<!--
     <param name="cloud1" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-main-1cm-clipped-icp-clean3.ply" />
     <param name="cloud2" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-container-merged-1cm-aligned-normals-ascii-filtered-realign-cutmain.ply" />
     <param name="cloud_mesh" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/mesh-oilrig-container-main-merged.obj" />
-
+-->
     <!-- FSC container1 and full model -->
 <!--
     <param name="cloud1" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-1stfloor-1cm-clipped-icp.ply" />
