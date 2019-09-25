@@ -203,7 +203,7 @@ int main(int argc, char* argv[])
 
   // back-project features to mesh
   std::vector<char> mesh_labels(mesh.polygons.size(), (char)0);
-  if (true) {
+  if (false) {
     ROS_INFO("Back-projecting annotations to mesh...");
     // tree
     pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGBNormal> ());
@@ -278,6 +278,8 @@ int main(int argc, char* argv[])
         label = 1; // trot
       else
         label = 2; // step
+      //if (votes_trot + votes_step < 10)
+      //  label = 0;
       mesh_labels[i] = label;
     }
   }
