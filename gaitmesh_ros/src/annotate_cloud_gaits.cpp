@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
   } else {
 
     ROS_INFO("Loading mesh...");
-    pcl::io::loadPolygonFileOBJ (path_mesh, mesh);
+    pcl::io::loadPolygonFile (path_mesh, mesh);
     ROS_INFO("Sampling mesh...");
     step1 = getCloudFromMesh (mesh, mesh_sampling_resolution);
 
