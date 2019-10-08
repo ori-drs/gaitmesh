@@ -9,17 +9,23 @@
     <param name="input_clouds_not_mesh" value="$(arg input_clouds_not_mesh)" />
 
     <param name="radius_normals" value="0.20" />
-    <param name="radius_robot" value="0.60" />
+    <param name="radius_robot" value="0.40" />
+    <param name="curvature_threshold" value="0.04" />
     <param name="mesh_sampling_resolution" value="0.10" />
 
     <!-- example model from Barcelona Robot Lab Dataset -->
-
+<!--
     <param name="mesh" value="$(find gaitmesh_ros)/data/BRL_final.obj" />
-
+-->
     <!-- oil_rig model -->
 <!--
     <param name="mesh" value="$(find recast_demos)/data/oilRig_detailed.obj" />
 -->
+    <!-- Blyth #ORCAHubDemos -->
+
+    <param name="cloud1" value="/home/martim/ORCAHubDemos/blyth-01-10-2019-5cm-downsampled-cleaned2-cutceiling-cutside-nopillars-cleanfloor.ply" />
+    <param name="cloud_mesh" value="/home/martim/ORCAHubDemos/mesh-blyth-01-10-2019-5cm-downsampled-cleaned2-cutceiling-cutside-nopillars-cleanfloor.obj" />
+
     <!-- FSC full model -->
 <!--
     <param name="cloud1" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-1stfloor-1cm-clipped-icp.ply" />

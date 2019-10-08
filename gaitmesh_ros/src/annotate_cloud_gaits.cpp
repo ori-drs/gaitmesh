@@ -39,6 +39,60 @@ inline bool pointInTriangle(const Eigen::Vector3d& p, const Eigen::Vector3d& a, 
   return pointsOnSameSideOfLine(p,a,b,c) && pointsOnSameSideOfLine(p,b,a,c) && pointsOnSameSideOfLine(p,c,a,b);
 }
 
+void setWalkInBox(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& cloud, double x, double y, double z, double dx, double dy, double dz, double step)
+{
+  pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGBNormal> ());
+  tree->setInputCloud (cloud);
+  for (double xx = x - dx; xx <= x + dx; xx += step) {
+    for (double yy = y - dy; yy <= y + dy; yy += step) {
+      for (double zz = z - dz; zz <= z + dz; zz += step) {
+        pcl::PointXYZRGBNormal pt;
+        pt.x = xx;
+        pt.y = yy;
+        pt.z = zz;
+        std::vector<int> k_indices;
+        std::vector<float> k_distances;
+        tree->nearestKSearch (pt, 5, k_indices, k_distances);
+        for (unsigned int i = 0; i < k_indices.size(); i++) {
+          cloud->points[ k_indices[i] ].r = 0;   // walk
+          cloud->points[ k_indices[i] ].g = 0;   // trot
+          cloud->points[ k_indices[i] ].b = 128; // step
+          cloud->points[ k_indices[i] ].a = 255;
+        }
+      }
+    }
+  }
+}
+
+void setWalkInCylinder(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& cloud, double x1, double y1, double z1, double x2, double y2, double z2, double r)
+{
+  pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGBNormal> ());
+  tree->setInputCloud (cloud);
+  double dist = sqrt( pow(x2-x1, 2.0) + pow(y2-y1, 2.0) + pow(y2-y1, 2.0) );
+  double step = 0.10;
+  double vx = step * (x2 - x1) / dist;
+  double vy = step * (y2 - y1) / dist;
+  double vz = step * (z2 - z1) / dist;
+  for (unsigned int i = 0; i <= dist / step; i++) {
+    double xx = x1 + vx * i;
+    double yy = y1 + vy * i;
+    double zz = z1 + vz * i;
+    pcl::PointXYZRGBNormal pt;
+    pt.x = xx;
+    pt.y = yy;
+    pt.z = zz;
+    std::vector<int> k_indices;
+    std::vector<float> k_distances;
+    tree->radiusSearch (pt, r, k_indices, k_distances);
+    for (unsigned int i = 0; i < k_indices.size(); i++) {
+      cloud->points[ k_indices[i] ].r = 0;   // walk
+      cloud->points[ k_indices[i] ].g = 0;   // trot
+      cloud->points[ k_indices[i] ].b = 128; // step
+      cloud->points[ k_indices[i] ].a = 255;
+    }
+  }
+}
+
 bool saveAreas(const std::string& path, const std::vector<char>& labels)
 {
   std::ofstream FILE(path, std::ios::out | std::ofstream::binary);
@@ -62,6 +116,7 @@ int main(int argc, char* argv[])
   bool input_clouds_not_mesh;
   double radius_normals;
   double radius_robot;
+  double curvature_threshold;
   double mesh_sampling_resolution;
   std::string path_mesh;
   std::string path1;
@@ -72,6 +127,7 @@ int main(int argc, char* argv[])
   nodeHandle.param("input_clouds_not_mesh", input_clouds_not_mesh, true);
   nodeHandle.param("radius_normals", radius_normals, 0.20);
   nodeHandle.param("radius_robot", radius_robot, 0.60);
+  nodeHandle.param("curvature_threshold", curvature_threshold, 0.06);
   nodeHandle.param("mesh_sampling_resolution", mesh_sampling_resolution, 0.05);
   nodeHandle.param("mesh", path_mesh, std::string(""));
   nodeHandle.param("cloud1", path1, std::string(""));
@@ -193,13 +249,16 @@ int main(int argc, char* argv[])
       pt.normal[1] = step3->points[point_id].normal[1];
       pt.normal[2] = step3->points[point_id].normal[2];
       pt.curvature = step3->points[point_id].curvature;
-      pt.r = (max_curvature < 0.06 ? 128 : 0); // walk
-      pt.g = (max_curvature < 0.06 ? 128 : 0); // trot
+      pt.r = (max_curvature < curvature_threshold ? 128 : 0); // walk
+      pt.g = (max_curvature < curvature_threshold ? 128 : 0); // trot
       pt.b = 128; // step
       pt.a = 255;
       step4->points.push_back(pt);
     }
   }
+
+  // manually add a mobility hazard
+  //setWalkInCylinder(step4, -1, 3.2, -1.1, 1.5, 2.9, -1.05, 0.90);
 
   // back-project features to mesh
   std::vector<char> mesh_labels(mesh.polygons.size(), (char)0);
@@ -278,6 +337,8 @@ int main(int argc, char* argv[])
         label = 1; // trot
       else
         label = 2; // step
+      if (votes_trot == 0 && votes_step == 0)
+        label = 0; // none
       //if (votes_trot + votes_step < 10)
       //  label = 0;
       mesh_labels[i] = label;
