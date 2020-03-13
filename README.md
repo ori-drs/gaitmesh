@@ -5,8 +5,9 @@ The result can then be used in the package recast_ros for multi-controller long-
 
 If you use this in your research, please cite:
 
-> Martim Brandao, Omer Burak Aladag, and Ioannis Havoutis, "**GaitMesh: controller-aware navigation meshes for long-range legged
-locomotion planning in multi-layered environments**", in *ICRA2020* (submitted).
+> Martim Brandao, Omer Burak Aladag, and Ioannis Havoutis, "**GaitMesh: controller-aware navigation meshes for long-range legged locomotion planning in multi-layered environments**", in *IEEE Robotics and Automation Letters (RAL)*, 2020.
+
+The paper is available [here](https://www.martimbrandao.com/papers/Brandao2020-ral.pdf), and the associated video is [here](https://www.youtube.com/watch?v=_BlhgTmFCOo).
 
 ## From a CAD model
 
