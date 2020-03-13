@@ -11,7 +11,7 @@ The paper is available [here](https://www.martimbrandao.com/papers/Brandao2020-r
 
 ## From a CAD model
 
-As an example, please download the [Barcelona Robotics Lab model](https://www.iri.upc.edu/research/webprojects/pau/datasets/BRL/zip/BRL_obj_wireframe.zip), and then run:
+As an example, please download the [Barcelona Robotics Lab model](https://www.iri.upc.edu/research/webprojects/pau/datasets/BRL/zip/BRL_obj_wireframe.zip), place it under data/BRL_final.obj, and then run:
 
 ```
 roslaunch gaitmesh_ros annotate_cloud_gaits.launch input_clouds_not_mesh:=false
