@@ -13,18 +13,33 @@
     <param name="curvature_threshold" value="0.04" />
     <param name="mesh_sampling_resolution" value="0.10" />
 
+<!-- DRS batcave -->
+
+<!--
+    <param name="cloud1" value="/home/rytz/catkin_ws/src/drs_map_data/leica/batcave/batcave_no_ceiling_1cm_filtered.ply"/>
+    <param name="cloud_mesh" value="/home/rytz/catkin_ws/src/drs_map_data/leica/batcave/batcave_no_ceiling_1cm_filtered.obj"/>
+-->
+
+<!-- loma world -->
+   
+	<param name="mesh" value="$(find loma_worlds)/meshes/cul_de_sac_floor.obj" /> 
+
+
     <!-- example model from Barcelona Robot Lab Dataset -->
 <!--
     <param name="mesh" value="$(find gaitmesh_ros)/data/BRL_final.obj" />
 -->
+
     <!-- oil_rig model -->
 <!--
     <param name="mesh" value="$(find recast_demos)/data/oilRig_detailed.obj" />
 -->
-    <!-- Blyth #ORCAHubDemos -->
 
-    <param name="cloud1" value="/home/martim/ORCAHubDemos/blyth-01-10-2019-5cm-downsampled-cleaned2-cutceiling-cutside-nopillars-cleanfloor.ply" />
-    <param name="cloud_mesh" value="/home/martim/ORCAHubDemos/mesh-blyth-01-10-2019-5cm-downsampled-cleaned2-cutceiling-cutside-nopillars-cleanfloor.obj" />
+    <!-- Blyth #ORCAHubDemos -->
+<!--
+    <param name="cloud1" value="/home/rytz/data/mesh_reconstructions/blyth/blyth-01-10-2019-5cm-downsampled-cleaned2-cutceiling-cutside-nopillars-cleanfloor.ply" />
+    <param name="cloud_mesh" value="/home/rytz/data/mesh_reconstructions/blyth/mesh-blyth-01-10-2019-5cm-downsampled-cleaned2-cutceiling-cutside-nopillars-cleanfloor.obj" />
+-->
 
     <!-- FSC full model -->
 <!--
