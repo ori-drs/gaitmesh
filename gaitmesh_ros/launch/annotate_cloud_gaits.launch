@@ -2,11 +2,13 @@
 <launch>
 
   <arg name="input_clouds_not_mesh" default="true" />
+  <arg name="mesh_labels_from_texture" default="false" />
 
-  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find gaitmesh_ros)/rviz/annotate_cloud_gaits.rviz" />
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find gaitmesh_ros)/rviz/annotate_cloud_gaits.rviz" unless="$(arg mesh_labels_from_texture)" />
 
   <node pkg="gaitmesh_ros" type="annotate_cloud_gaits" name="annotate_cloud_gaits" output="screen">
     <param name="input_clouds_not_mesh" value="$(arg input_clouds_not_mesh)" />
+    <param name="mesh_labels_from_texture" value="$(arg mesh_labels_from_texture)" />
 
     <param name="radius_normals" value="0.20" />
     <param name="radius_robot" value="0.40" />
@@ -16,7 +18,22 @@
     <!-- example model from Barcelona Robot Lab Dataset -->
 
     <param name="mesh" value="$(find gaitmesh_ros)/data/BRL_final.obj" />
-
+<!--
+    <param name="mesh" value="$(find gaitmesh_ros)/data/BRL_final-subdivided-11k.ply" />
+-->
+    <!-- example model from MIT Stata -->
+<!--
+    <param name="mesh" value="$(find gaitmesh_ros)/data/stata_03-subdivided-10k.ply" />
+-->
+    <!-- sketchfab models (launch with mesh_labels_from_texture:=true) -->
+<!--
+    <param name="mesh" value="$(find gaitmesh_ros)/data/sketchfab/GravityFalls.obj" />
+    <param name="mesh" value="$(find gaitmesh_ros)/data/sketchfab/inkwell-isle-two.obj" />
+    <param name="mesh" value="$(find gaitmesh_ros)/data/sketchfab/mac-anu-r1.obj" />
+    <param name="mesh" value="$(find gaitmesh_ros)/data/sketchfab/medieval-fantasy-book.obj" />
+    <param name="mesh" value="$(find gaitmesh_ros)/data/sketchfab/sf01.obj" />
+    <param name="mesh" value="$(find gaitmesh_ros)/data/sketchfab/tempel-von-edfu.obj" />
+-->
     <!-- oil_rig model -->
 <!--
     <param name="mesh" value="$(find recast_demos)/data/oilRig_detailed.obj" />

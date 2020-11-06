@@ -6,9 +6,11 @@
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/PolygonMesh.h>
+#include <pcl/TextureMesh.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/io/obj_io.h>
 #include <pcl/io/vtk_lib_io.h>
+#include <pcl/io/auto_io.h>
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <fstream>
@@ -114,6 +116,7 @@ int main(int argc, char* argv[])
 
   // parameters (input)
   bool input_clouds_not_mesh;
+  bool mesh_labels_from_texture;
   double radius_normals;
   double radius_robot;
   double curvature_threshold;
@@ -125,6 +128,7 @@ int main(int argc, char* argv[])
   std::string path4;
   std::string path_cloud_mesh;
   nodeHandle.param("input_clouds_not_mesh", input_clouds_not_mesh, true);
+  nodeHandle.param("mesh_labels_from_texture", mesh_labels_from_texture, false);
   nodeHandle.param("radius_normals", radius_normals, 0.20);
   nodeHandle.param("radius_robot", radius_robot, 0.60);
   nodeHandle.param("curvature_threshold", curvature_threshold, 0.06);
@@ -183,6 +187,38 @@ int main(int argc, char* argv[])
       // load mesh from file
       pcl::io::loadPolygonFilePLY (mesh_output_file, mesh);
     }
+
+  } else if (mesh_labels_from_texture) {
+
+      // load textured mesh
+      pcl::TextureMesh tex_mesh;
+      pcl::io::load (path_mesh, tex_mesh);
+
+      // init output mesh
+      pcl::PolygonMesh mesh;
+      mesh.header = tex_mesh.header;
+      mesh.cloud = tex_mesh.cloud;
+
+      // get labels from texture
+      std::vector<char> mesh_labels;
+      mesh_labels.reserve(mesh.polygons.size());
+      for (int i = 0; i < tex_mesh.tex_polygons.size(); i++) {
+        int id = (i % 19) + 1;
+        ROS_INFO("Count[%d] = %d", id, (int)tex_mesh.tex_polygons[i].size());
+        mesh.polygons.insert(mesh.polygons.end(), tex_mesh.tex_polygons[i].begin(), tex_mesh.tex_polygons[i].end());
+        for (int j = 0; j < tex_mesh.tex_polygons[i].size(); j++) {
+          mesh_labels.push_back((char)id);
+        }
+      }
+
+      // save annotated mesh
+      const std::string mesh_output_file  = ros::package::getPath("gaitmesh_ros") + "/data/annotate_cloud_gaits_mesh.obj";
+      const std::string area_output_file  = ros::package::getPath("gaitmesh_ros") + "/data/annotate_cloud_gaits_mesh.dat";
+      ROS_INFO("Saving mesh as OBJ...");
+      pcl::io::saveOBJFile(mesh_output_file, mesh);
+      ROS_INFO("Saving mesh annotations...");
+      saveAreas(area_output_file, mesh_labels);
+      return 0;
 
   } else {
 
