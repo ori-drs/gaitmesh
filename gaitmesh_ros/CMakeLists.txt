@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   roslib
   visualization_msgs
   pcl_ros
+  recast_ros
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -62,11 +64,10 @@ add_definitions(${PCL_DEFINITIONS})
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   RosStance.msg
-#   RosPlanningProblem.msg
-# )
+add_message_files(
+  FILES
+  CloudMesh.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -83,12 +84,12 @@ add_definitions(${PCL_DEFINITIONS})
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-#   sensor_msgs
-#   pcl_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+  sensor_msgs
+  pcl_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -122,7 +123,7 @@ add_definitions(${PCL_DEFINITIONS})
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES wabian_planner
-  CATKIN_DEPENDS roscpp roslib visualization_msgs pcl_ros
+  CATKIN_DEPENDS roscpp roslib visualization_msgs pcl_ros recast_ros
 #  DEPENDS system_lib
 )
 
@@ -146,9 +147,19 @@ include_directories(
 # add_dependencies(wabian_planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## annotate_cloud_gaits
-add_executable(annotate_cloud_gaits src/annotate_cloud_gaits.cpp src/PclMeshSampling.cpp)
+add_executable(annotate_cloud_gaits src/annotate_cloud_gaits.cpp)
 add_dependencies(annotate_cloud_gaits ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(annotate_cloud_gaits ${PCL_LIBRARIES} ${catkin_LIBRARIES})
+
+## publish_initial_cloud
+add_executable(publish_initial_cloud src/publish_initial_cloud.cpp src/PclMeshSampling.cpp src/MeshLabReconstruction.cpp)
+add_dependencies(publish_initial_cloud ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(publish_initial_cloud ${PCL_LIBRARIES} ${catkin_LIBRARIES})
+
+## mesh_from_mapping_server
+add_executable(mesh_from_mapping_server src/mesh_from_mapping_server.cpp src/MeshLabReconstruction.cpp)
+add_dependencies(mesh_from_mapping_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(mesh_from_mapping_server ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
 #############
 ## Install ##
