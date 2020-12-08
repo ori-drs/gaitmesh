@@ -1,0 +1,3 @@
+pcl_msgs/PolygonMesh mesh
+sensor_msgs/PointCloud2 cloud
+geometry_msgs/Point reference_point

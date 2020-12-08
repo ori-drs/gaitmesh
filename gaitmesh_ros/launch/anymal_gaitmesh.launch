@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="input_clouds_not_mesh" default="true" />
+  <arg name="mesh" default="" />
+  <arg name="cloud1" default="" />
+
+  <include file="$(find gaitmesh_ros)/launch/annotate_cloud_gaits.launch"/>
+  <include file="$(find recast_demos)/launch/recast_node.launch"/>
+  <include file="$(find icp_odometry_ros)/launch/odometry_anymal.launch"/>
+  <include file="$(find high_level_planner)/launch/high_level_planner.launch"/>
+  <include file="$(find anymal_boxy_sim)/launch/sim_batcave.launch"/>
+
+  <node pkg="gaitmesh_ros" type="mesh_from_mapping_server" name="mesh_from_mapping_server" output="screen"/>
+</launch>
