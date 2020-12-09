@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="input_clouds_not_mesh" default="true" />
+  <arg name="mesh" default="" />
+  <arg name="cloud1" default="" />
+  <arg name="cloud2" default="" />
+  <arg name="cloud3" default="" />
+  <arg name="cloud4" default="" />
+  <arg name="radius_normals" default="0.20" />
+  <arg name="radius_robot" default="0.40" />
+  <arg name="curvature_threshold" default="0.04" />
+  <arg name="mesh_sampling_resolution" default="0.10" />
+
+  <node type="rviz" name="$(anon rviz)" pkg="rviz" args="-d $(find gaitmesh_ros)/rviz/annotate_cloud_gaits.rviz"/>
+
+  <node pkg="gaitmesh_ros" type="mesh_from_mapping_server" name="mesh_from_mapping_server" output="screen"/>
+
+  <node pkg="gaitmesh_ros" type="annotate_cloud_gaits_continuous" name="annotate_cloud_gaits_continuous" output="screen">
+    <param name="radius_normals" value="$(arg radius_normals)" />
+    <param name="radius_robot" value="$(arg radius_robot)" />
+    <param name="curvature_threshold" value="$(arg curvature_threshold)" />
+  </node>
+
+  <node pkg="gaitmesh_ros" type="publish_initial_cloud" name="publish_from_file" output="screen">
+    <param name="input_clouds_not_mesh" value="$(arg input_clouds_not_mesh)" />
+    <param name="mesh_sampling_resolution" value="$(arg mesh_sampling_resolution)" />
+    <param name="mesh" value="$(arg mesh)" />
+    <param name="cloud1" value="$(arg cloud1)" />
+    <param name="cloud2" value="$(arg cloud2)" />
+    <param name="cloud3" value="$(arg cloud3)" />
+    <param name="cloud4" value="$(arg cloud4)" />
+    <param name="reference_point_x" value="5" />
+    <param name="reference_point_y" value="-3" />
+    <param name="reference_point_z" value="0.8" />
+  </node>
+</launch>

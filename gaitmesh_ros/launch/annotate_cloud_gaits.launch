@@ -45,39 +45,39 @@
 -->
     <!-- FSC full model -->
 <!--
-    <param name="cloud1" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-1stfloor-1cm-clipped-icp.ply" />
-    <param name="cloud2" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/mesh-oilrig-merged-main-1cm-clipped-icp-clean.ply" />
-    <param name="cloud3" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-west-1cm-clipped-icp.ply" />
-    <param name="cloud_mesh" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/mesh-oilrig-merged-all.obj" />
+    <param name="cloud1" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-merged-1stfloor-1cm-clipped-icp.ply" />
+    <param name="cloud2" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/mesh-oilrig-merged-main-1cm-clipped-icp-clean.ply" />
+    <param name="cloud3" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-merged-west-1cm-clipped-icp.ply" />
+    <param name="cloud_mesh" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/mesh-oilrig-merged-all.obj" />
 -->
     <!-- FSC main floor only -->
 <!--
-    <param name="cloud1" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-main-1cm-clipped-icp-clean3.ply" />
-    <param name="cloud_mesh" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/mesh-oilrig-merged-main-1cm-clipped-icp-clean3.obj" />
+    <param name="cloud1" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-merged-main-1cm-clipped-icp-clean3.ply" />
+    <param name="cloud_mesh" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/mesh-oilrig-merged-main-1cm-clipped-icp-clean3.obj" />
 -->
     <!-- FSC container1 only -->
 <!--
-    <param name="cloud2" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-container-merged-1cm-aligned-normals-ascii-filtered.ply" />
-    <param name="cloud_mesh" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/mesh-oilrig-container-merged-1cm-aligned-normals-ascii-filtered.obj" />
+    <param name="cloud2" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-container-merged-1cm-aligned-normals-ascii-filtered.ply" />
+    <param name="cloud_mesh" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/mesh-oilrig-container-merged-1cm-aligned-normals-ascii-filtered.obj" />
 -->
     <!-- FSC container1 and main -->
 <!--
-    <param name="cloud1" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-main-1cm-clipped-icp-clean3.ply" />
-    <param name="cloud2" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-container-merged-1cm-aligned-normals-ascii-filtered-realign-cutmain.ply" />
-    <param name="cloud_mesh" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/mesh-oilrig-container-main-merged.obj" />
+    <param name="cloud1" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-merged-main-1cm-clipped-icp-clean3.ply" />
+    <param name="cloud2" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-container-merged-1cm-aligned-normals-ascii-filtered-realign-cutmain.ply" />
+    <param name="cloud_mesh" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/mesh-oilrig-container-main-merged.obj" />
 -->
     <!-- FSC container1 and full model -->
 <!--
-    <param name="cloud1" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-1stfloor-1cm-clipped-icp.ply" />
-    <param name="cloud2" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-main-1cm-clipped-icp-clean3.ply" />
-    <param name="cloud3" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-merged-west-1cm-clipped-icp-clean.ply" />
-    <param name="cloud4" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/oilrig-container-merged-1cm-aligned-normals-ascii-filtered-realign-cutmain.ply" />
-    <param name="cloud_mesh" value="/home/martim/drs_testing_data/leica/fire-service-college/extended_map/mesh-oilrig-final-main-container-1stfloor-west.obj" />
+    <param name="cloud1" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-merged-1stfloor-1cm-clipped-icp.ply" />
+    <param name="cloud2" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-merged-main-1cm-clipped-icp-clean3.ply" />
+    <param name="cloud3" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-merged-west-1cm-clipped-icp-clean.ply" />
+    <param name="cloud4" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/oilrig-container-merged-1cm-aligned-normals-ascii-filtered-realign-cutmain.ply" />
+    <param name="cloud_mesh" value="$(find drs_testing_data)/leica/fire-service-college/extended_map/mesh-oilrig-final-main-container-1stfloor-west.obj" />
 -->
     <!-- ORI map -->
 <!--
-    <param name="cloud1" value="/home/martim/drs_testing_data/leica/ori-building-maps/map_filter_cutaway_for_autonomy_5cm.ply" />
-    <param name="cloud_mesh" value="/home/martim/drs_testing_data/leica/ori-building-maps/mesh_holefilled_map_filter_cutaway_for_autonomy_5cm.obj" />
+    <param name="cloud1" value="$(find drs_testing_data)/leica/ori-building-maps/map_filter_cutaway_for_autonomy_5cm.ply" />
+    <param name="cloud_mesh" value="$(find drs_testing_data)/leica/ori-building-maps/mesh_holefilled_map_filter_cutaway_for_autonomy_5cm.obj" />
 -->
   </node>
 
