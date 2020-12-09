@@ -1,4 +1,5 @@
 // Adapted from PCL's mesh_sampling.cpp by Martim Brandao
+// clang-format off
 /*
  * Software License Agreement (BSD License)
  *
@@ -289,4 +290,4 @@ getCloudAndNormalsFromMesh (pcl::PolygonMesh &mesh, float leaf_size)
   grid_.filter (*res);
   return res;
 }
-
+// clang-format on
