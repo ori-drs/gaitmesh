@@ -12,7 +12,7 @@ jobs:
       matrix:
         env:
           - {ROS_DISTRO: melodic}
-          - {ROS_DISTRO: noetic}
+          # - {ROS_DISTRO: noetic} # grid_map_ros is not yet released for Noetic
           # - {ROS_DISTRO: melodic, CLANG_FORMAT_CHECK: file, CLANG_FORMAT_VERSION: 3.9}
     env:
       CCACHE_DIR: /github/home/.ccache # Enable ccache
