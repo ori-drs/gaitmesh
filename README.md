@@ -1,4 +1,4 @@
-# gaitmesh
+# gaitmesh ![CI](https://github.com/ori-drs/gaitmesh/workflows/CI/badge.svg)
 
 This package processes a mesh model (or point cloud and mesh) to produce an annotated version of the mesh where each triangle is associated with a choice of gait-controller for a legged robot.
 The result can then be used in the package [recast_ros](https://github.com/ori-drs/recast_ros) for multi-controller long-term locomotion planning for a legged robot.
