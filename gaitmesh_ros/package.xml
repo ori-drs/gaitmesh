@@ -11,6 +11,8 @@
   <author email="martim@robots.ox.ac.uk">Martim Brandao</author>
   <author email="aladagomer@sabanciuniv.edu">Omer Burak Aladag</author>
   <author email="ioannis@robots.ox.ac.uk">Ioannis Havoutis</author>
+  <author email="wolfgang@robots.ox.ac.uk">Wolfgang Merkt</author>
+  <author email="danarmstrongg@gmail.com">Dan Armstrong</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
