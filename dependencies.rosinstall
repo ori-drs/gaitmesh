@@ -1,0 +1,8 @@
+- git:
+    uri: https://github.com/ori-drs/recastnavigation.git
+    version: master
+    local-name: recast_navigation
+- git:
+    uri: https://github.com/ori-drs/recast_ros.git
+    version: master
+    local-name: recast_ros
