@@ -1,13 +1,15 @@
 #include <ros/ros.h>
 #include <gaitmesh_ros/CloudMesh.h>
-#include "PclMeshSampling.h"
-#include "MeshLabReconstruction.h"
+#include "pcl/PclMeshSampling.h"
+#include <gaitmesh_ros/meshlab_reconstruction.hpp>
 #include <pcl/features/normal_3d.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/PolygonMesh.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/io/obj_io.h>
 #include <pcl/io/vtk_lib_io.h>
+
+using namespace gaitmesh;
 
 int main(int argc, char* argv[])
 {
@@ -63,7 +65,7 @@ int main(int argc, char* argv[])
     if (path_mesh != "") {
       pcl::io::loadPolygonFileOBJ (path_mesh, mesh);
     } else {
-      mesh = reconstructMesh(input_cloud);
+      mesh = reconstructMeshMeshlab(input_cloud);
     }
 
   } else {
@@ -83,9 +85,8 @@ int main(int argc, char* argv[])
   initial_msg.reference_point.z = reference_point_z;
   cloud_mesh_pub.publish(initial_msg);
 
-  ros::Rate rate(1.0); // hz
-  while (nodeHandle.ok()) {
-    rate.sleep();
-    ros::spinOnce();
-  }
+  ros::Rate rate(1 / 5); // Hz
+  rate.sleep();  // Sleep for 5s, then exit
+
+  return EXIT_SUCCESS;
 }

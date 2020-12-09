@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <gaitmesh_ros/CloudMesh.h>
-#include "MeshLabReconstruction.h"
+#include <gaitmesh_ros/meshlab_reconstruction.hpp>
 #include <pcl/features/normal_3d.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/PolygonMesh.h>
@@ -12,6 +12,8 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include "geometry_msgs/PoseWithCovarianceStamped.h"
 
+using namespace gaitmesh;
+
 void cloudCallback(const sensor_msgs::PointCloud2::ConstPtr& cloudMsg, const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg, ros::Publisher cloud_mesh_pub, bool* callback_time_elapsed) {
   ROS_INFO("Called this");
   if (*callback_time_elapsed) {
@@ -19,7 +21,7 @@ void cloudCallback(const sensor_msgs::PointCloud2::ConstPtr& cloudMsg, const geo
     pcl_conversions::toPCL(*cloudMsg, pcl_pc2);
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromPCLPointCloud2(pcl_pc2, *input_cloud);
-    pcl::PolygonMesh mesh = reconstructMesh(input_cloud);
+    pcl::PolygonMesh mesh = reconstructMeshMeshlab(input_cloud);
 
     gaitmesh_ros::CloudMesh cloud_mesh_msg;
     cloud_mesh_msg.cloud = *cloudMsg;
