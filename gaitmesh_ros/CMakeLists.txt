@@ -146,8 +146,14 @@ include_directories(
 ## either from message generation or dynamic reconfigure
 # add_dependencies(wabian_planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+## annotate_cloud_gaits_continuous (temporary - duplicates code!)
+add_executable(annotate_cloud_gaits_continuous src/annotate_cloud_gaits_continuous.cpp)
+add_dependencies(annotate_cloud_gaits_continuous ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(annotate_cloud_gaits_continuous ${PCL_LIBRARIES} ${catkin_LIBRARIES})
+
+
 ## annotate_cloud_gaits
-add_executable(annotate_cloud_gaits src/annotate_cloud_gaits.cpp)
+add_executable(annotate_cloud_gaits src/annotate_cloud_gaits.cpp src/PclMeshSampling.cpp)
 add_dependencies(annotate_cloud_gaits ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(annotate_cloud_gaits ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
