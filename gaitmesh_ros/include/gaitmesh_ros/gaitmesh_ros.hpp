@@ -1,13 +1,13 @@
 #pragma once
 
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
 #include <pcl/PolygonMesh.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 
 #include <gaitmesh_ros/common.hpp>
 
-namespace gaitmesh {
-
+namespace gaitmesh
+{
 void setWalkInBox(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& cloud, double x, double y, double z, double dx, double dy, double dz, double step);
 
 void setWalkInCylinder(const pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr& cloud, double x1, double y1, double z1, double x2, double y2, double z2, double r);
