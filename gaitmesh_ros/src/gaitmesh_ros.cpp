@@ -85,6 +85,13 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
                                 pcl::PointCloud<pcl::PointNormal>::Ptr normal_cloud,
                                 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr gait_cloud)
 {
+    // Check if the cloud is empty - if it is, return:
+    if (input_cloud->size() == 0)
+    {
+        ROS_WARN_STREAM("Input cloud is empty - not running annotation. Cloud size = " << input_cloud->size() << ", Mesh #Polygons = " << mesh.polygons.size());
+        return std::vector<char>();
+    }
+
     // Step 2: Outlier filter
     // if (!outlier_removal_cloud) outlier_removal_cloud.reset(new pcl::PointCloud<pcl::PointXYZ>());
     if (false)
