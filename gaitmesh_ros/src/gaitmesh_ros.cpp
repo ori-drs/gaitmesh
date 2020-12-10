@@ -89,7 +89,7 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
     // if (!outlier_removal_cloud) outlier_removal_cloud.reset(new pcl::PointCloud<pcl::PointXYZ>());
     if (false)
     {
-        ROS_INFO("Removing outliers...");
+        ROS_DEBUG("Removing outliers...");
         pcl::RadiusOutlierRemoval<pcl::PointXYZ> sor;
         sor.setInputCloud(input_cloud);
         sor.setRadiusSearch(0.2);
@@ -104,7 +104,7 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
     // Step 3: Run terrain-related filters
     // if (!normal_cloud) normal_cloud.reset(new pcl::PointCloud<pcl::PointNormal>());
     {
-        ROS_INFO("Estimating normals...");
+        ROS_DEBUG("Estimating normals...");
         const float radius = radius_normals;
         pcl::NormalEstimationOMP<pcl::PointXYZ, pcl::Normal> ne;
         ne.setInputCloud(input_cloud);
@@ -119,7 +119,7 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
     // Step 4: Gait annotation
     // if (!gait_cloud) gait_cloud.reset(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
     {
-        ROS_INFO("Running filters...");
+        ROS_DEBUG("Running filters...");
         const float radius = radius_robot;
         gait_cloud->points.reserve(normal_cloud->points.size());
         pcl::search::KdTree<pcl::PointNormal>::Ptr tree(new pcl::search::KdTree<pcl::PointNormal>());
@@ -195,13 +195,16 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
     }
     else
     {
-        ROS_INFO("Back-projecting annotations to mesh...");
+        ROS_DEBUG("Back-projecting annotations to mesh...");
         // tree
         pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZRGBNormal>());
         tree->setInputCloud(gait_cloud);
         // go through all mesh triangles
         pcl::PointCloud<pcl::PointXYZRGBNormal> mesh_cloud;
+        // This line is expected to throw warnings - thus disable them:
+        pcl::console::setVerbosityLevel(pcl::console::L_ALWAYS);
         pcl::fromPCLPointCloud2(mesh.cloud, mesh_cloud);
+        pcl::console::setVerbosityLevel(pcl::console::L_WARN);  // Re-enable
         for (int i = 0; i < mesh.polygons.size(); i++)
         {
             // we will vote for each of the gait-controller options
