@@ -52,11 +52,12 @@ int main(int argc, char* argv[])
     if (input_clouds_not_mesh)
     {
         // load and join clouds
-        ROS_INFO("Loading clouds...");
         if (cloud_paths.size() == 0)
         {
-            ROS_ERROR("No point cloud provided");
+            ROS_ERROR("No point cloud provided - shutting down publish_initial_cloud node.");
+            return EXIT_SUCCESS;
         }
+        ROS_INFO("Loading clouds...");
         for (unsigned int i = 0; i < cloud_paths.size(); i++)
         {
             ROS_INFO("Processing cloud %d", i);
@@ -94,8 +95,8 @@ int main(int argc, char* argv[])
     initial_msg.reference_point.z = reference_point_z;
     cloud_mesh_pub.publish(initial_msg);
 
-    ros::Rate rate(1 / 5);  // Hz
-    rate.sleep();           // Sleep for 5s, then exit
+    ros::Rate rate(1 / 5.0);  // Hz
+    rate.sleep();             // Sleep for 5s, then exit
 
     return EXIT_SUCCESS;
 }
