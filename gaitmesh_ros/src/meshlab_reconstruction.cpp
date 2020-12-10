@@ -23,7 +23,7 @@ pcl::PolygonMesh reconstructMeshMeshlab(pcl::PointCloud<pcl::PointXYZ>::Ptr clou
     pcl::io::savePLYFile(cloud_output_file, *cloud);
     // run meshlab server
     std::stringstream cmd;
-    cmd << "meshlabserver -i " << cloud_output_file << " -o " << mesh_output_file << " -s " << meshlab_server_file;
+    cmd << "meshlabserver -i " << cloud_output_file << " -o " << mesh_output_file << " -s " << meshlab_server_file << " > /dev/null 2> /dev/null";
     // TODO: Capture output
     int system_result = system(cmd.str().c_str());
     // load mesh from file
