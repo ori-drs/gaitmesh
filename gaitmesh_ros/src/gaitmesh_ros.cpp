@@ -161,39 +161,6 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
 
     // back-project features to mesh
     std::vector<char> mesh_labels(mesh.polygons.size(), (char)0);
-    if (false)
-    {
-        ROS_INFO("Back-projecting annotations to mesh...");
-        // tree
-        pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZRGBNormal>());
-        tree->setInputCloud(gait_cloud);
-        // go through all mesh triangles
-        pcl::PointCloud<pcl::PointXYZRGBNormal> mesh_cloud;
-        pcl::fromPCLPointCloud2(mesh.cloud, mesh_cloud);
-        for (int i = 0; i < mesh.polygons.size(); i++)
-        {
-            // get closest annotated-cloud point
-            Eigen::Vector3d v0 = pcl2eig(mesh_cloud.points[mesh.polygons[i].vertices[0]]);
-            Eigen::Vector3d v1 = pcl2eig(mesh_cloud.points[mesh.polygons[i].vertices[1]]);
-            Eigen::Vector3d v2 = pcl2eig(mesh_cloud.points[mesh.polygons[i].vertices[2]]);
-            Eigen::Vector3d vc = (v0 + v1 + v2) / 3;
-            pcl::PointXYZRGBNormal pt_center = eig2pcl(vc);
-            std::vector<int> k_indices;
-            std::vector<float> k_distances;
-            tree->nearestKSearch(pt_center, 1, k_indices, k_distances);
-            // assign label to triangle
-            const pcl::PointXYZRGBNormal& nn = gait_cloud->points[k_indices[0]];
-            char label = 2;
-            if (nn.g > 0)
-                label = 1;  // trot
-            else if (nn.b > 0)
-                label = 2;  // step
-            else
-                label = 0;  // unwalkable
-            mesh_labels[i] = label;
-        }
-    }
-    else
     {
         ROS_DEBUG("Back-projecting annotations to mesh...");
         // tree
