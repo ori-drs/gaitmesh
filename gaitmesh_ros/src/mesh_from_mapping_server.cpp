@@ -1,28 +1,35 @@
-#include <gaitmesh_ros/CloudMesh.h>
+#include <pcl/PolygonMesh.h>
+#include <pcl_conversions/pcl_conversions.h>
+
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/synchronizer.h>
-#include <pcl/PolygonMesh.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/io/obj_io.h>
-#include <pcl/io/ply_io.h>
-#include <pcl/io/vtk_lib_io.h>
-#include <pcl_conversions/pcl_conversions.h>
 #include <ros/ros.h>
+
+#include <gaitmesh_ros/CloudMesh.h>
 #include <gaitmesh_ros/meshlab_reconstruction.hpp>
-#include "geometry_msgs/PoseWithCovarianceStamped.h"
 
 using namespace gaitmesh;
 
 void cloudCallback(const sensor_msgs::PointCloud2::ConstPtr& cloudMsg, const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg, ros::Publisher cloud_mesh_pub, bool* callback_time_elapsed)
 {
-    ROS_INFO("Called this");
     if (*callback_time_elapsed)
     {
         pcl::PCLPointCloud2 pcl_pc2;
         pcl_conversions::toPCL(*cloudMsg, pcl_pc2);
         pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::fromPCLPointCloud2(pcl_pc2, *input_cloud);
+
+        // TODO: Subsample with VoxelGrid!
+        ROS_WARN_STREAM("Input cloud size: " << input_cloud->size());
+
+        if (input_cloud->size() == 0)
+        {
+            ROS_WARN_STREAM("Input point cloud empty, skipping processing.");
+            return;
+        }
+
         pcl::PolygonMesh mesh = reconstructMeshMeshlab(input_cloud);
 
         gaitmesh_ros::CloudMesh cloud_mesh_msg;
