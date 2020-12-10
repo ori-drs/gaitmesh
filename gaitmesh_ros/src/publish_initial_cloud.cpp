@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
     initial_msg.reference_point.z = reference_point_z;
     cloud_mesh_pub.publish(initial_msg);
 
-    ros::Rate rate(1 / 5);  // Hz
+    ros::Rate rate(1 / 5.0);  // Hz
     rate.sleep();           // Sleep for 5s, then exit
 
     return EXIT_SUCCESS;
