@@ -74,22 +74,17 @@ add_executable(annotate_cloud_gaits_continuous src/annotate_cloud_gaits_continuo
 add_dependencies(annotate_cloud_gaits_continuous ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(annotate_cloud_gaits_continuous ${PROJECT_NAME} ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
-## publish_initial_cloud
-add_executable(publish_initial_cloud src/publish_initial_cloud.cpp)
-add_dependencies(publish_initial_cloud ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(publish_initial_cloud ${PROJECT_NAME} ${PCL_LIBRARIES} ${catkin_LIBRARIES})
-
-## mesh_from_mapping_server
-add_executable(mesh_from_mapping_server src/mesh_from_mapping_server.cpp)
-add_dependencies(mesh_from_mapping_server ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(mesh_from_mapping_server ${PROJECT_NAME} ${PCL_LIBRARIES} ${catkin_LIBRARIES})
+## publish_cloud_meshes
+add_executable(publish_cloud_meshes src/publish_cloud_meshes.cpp)
+add_dependencies(publish_cloud_meshes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(publish_cloud_meshes ${PROJECT_NAME} ${PCL_LIBRARIES} ${catkin_LIBRARIES})
 
 #############
 ## Install ##
 #############
 
 # Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME} annotate_cloud_gaits annotate_cloud_gaits_continuous publish_initial_cloud mesh_from_mapping_server 
+install(TARGETS ${PROJECT_NAME} annotate_cloud_gaits annotate_cloud_gaits_continuous publish_cloud_meshes
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

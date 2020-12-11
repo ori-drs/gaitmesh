@@ -13,15 +13,13 @@
 
   <node type="rviz" name="$(anon rviz)" pkg="rviz" args="-d $(find gaitmesh_ros)/rviz/annotate_cloud_gaits.rviz"/>
 
-  <node pkg="gaitmesh_ros" type="mesh_from_mapping_server" name="mesh_from_mapping_server" output="screen"/>
-
   <node pkg="gaitmesh_ros" type="annotate_cloud_gaits_continuous" name="annotate_cloud_gaits_continuous" output="screen">
     <param name="radius_normals" value="$(arg radius_normals)" />
     <param name="radius_robot" value="$(arg radius_robot)" />
     <param name="curvature_threshold" value="$(arg curvature_threshold)" />
   </node>
 
-  <node pkg="gaitmesh_ros" type="publish_initial_cloud" name="publish_from_file" output="screen">
+  <node pkg="gaitmesh_ros" type="publish_cloud_meshes" name="publish_cloud_meshes" output="screen">
     <param name="input_clouds_not_mesh" value="$(arg input_clouds_not_mesh)" />
     <param name="mesh_sampling_resolution" value="$(arg mesh_sampling_resolution)" />
     <param name="mesh" value="$(arg mesh)" />

@@ -29,28 +29,31 @@ public:
 
     void processCloudMesh()
     {
-        pcl::PCLPointCloud2 pcl_pc2;
-        pcl::PolygonMesh mesh;
-        pcl_conversions::toPCL(cloud_mesh_.cloud, pcl_pc2);
-        pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
-        pcl::fromPCLPointCloud2(pcl_pc2, *input_cloud);
-        pcl_conversions::toPCL(cloud_mesh_.mesh, mesh);
+        if (new_cloud_mesh_recieved_) {
+            new_cloud_mesh_recieved_ = false;
+            pcl::PCLPointCloud2 pcl_pc2;
+            pcl::PolygonMesh mesh;
+            pcl_conversions::toPCL(cloud_mesh_.cloud, pcl_pc2);
+            pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+            pcl::fromPCLPointCloud2(pcl_pc2, *input_cloud);
+            pcl_conversions::toPCL(cloud_mesh_.mesh, mesh);
 
-        pcl::PointCloud<pcl::PointXYZ>::Ptr step2(new pcl::PointCloud<pcl::PointXYZ>());                    // outlier_removal_cloud
-        pcl::PointCloud<pcl::PointNormal>::Ptr step3(new pcl::PointCloud<pcl::PointNormal>());              // normal_cloud
-        pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr step4(new pcl::PointCloud<pcl::PointXYZRGBNormal>());  // gait_cloud
-        std::vector<char> mesh_labels = annotateCloud(input_cloud, mesh, radius_normals_, radius_robot_, curvature_threshold_, step2, step3, step4);
+            pcl::PointCloud<pcl::PointXYZ>::Ptr step2(new pcl::PointCloud<pcl::PointXYZ>());                    // outlier_removal_cloud
+            pcl::PointCloud<pcl::PointNormal>::Ptr step3(new pcl::PointCloud<pcl::PointNormal>());              // normal_cloud
+            pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr step4(new pcl::PointCloud<pcl::PointXYZRGBNormal>());  // gait_cloud
+            std::vector<char> mesh_labels = annotateCloud(input_cloud, mesh, radius_normals_, radius_robot_, curvature_threshold_, step2, step3, step4);
 
-        recast_ros::InputMeshSrv srv;
-        srv.request.reference_point = cloud_mesh_.reference_point;
-        srv.request.input_mesh = cloud_mesh_.mesh;
-        srv.request.area_labels.resize(mesh_labels.size());
-        for (size_t i = 0; i < mesh_labels.size(); i++)
-            srv.request.area_labels[i] = mesh_labels[i];
-        if (client_recast_.call(srv))
-            ROS_INFO("Map was sent");
-        else
-            ROS_ERROR("Failed to send map");
+            recast_ros::InputMeshSrv srv;
+            srv.request.reference_point = cloud_mesh_.reference_point;
+            srv.request.input_mesh = cloud_mesh_.mesh;
+            srv.request.area_labels.resize(mesh_labels.size());
+            for (size_t i = 0; i < mesh_labels.size(); i++)
+                srv.request.area_labels[i] = mesh_labels[i];
+            if (client_recast_.call(srv))
+                ROS_INFO("Map was sent");
+            else
+                ROS_ERROR("Failed to send map");
+        }
     }
 
 protected:
@@ -64,11 +67,13 @@ protected:
     ros::Subscriber cloud_mesh_sub_;
 
     gaitmesh_ros::CloudMesh cloud_mesh_;  //!< Most recently received CloudMesh - local copy, will be processed in processCloudMesh()
+    bool new_cloud_mesh_recieved_ = false;
 
     void cloudMeshCallback(const gaitmesh_ros::CloudMesh::ConstPtr& msg)
     {
         ROS_INFO("Received mesh - storing internally");
         cloud_mesh_ = *msg;
+        new_cloud_mesh_recieved_ = true;
     }
 };
 
