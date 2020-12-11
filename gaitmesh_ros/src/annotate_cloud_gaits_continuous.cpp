@@ -25,12 +25,18 @@ public:
 
         client_recast_ = nh_.serviceClient<recast_ros::InputMeshSrv>("/recast_node/input_mesh");
         cloud_mesh_sub_ = nh_.subscribe("/gaitmesh_ros/input_cloud_mesh", 1, &ContinuousGaitMesh::cloudMeshCallback, this);
+
+        ROS_INFO("Wait for Recast node update serve to come online...");
+        client_recast_.waitForExistence();
+        ROS_INFO("Recast node online!");
     }
 
     void processCloudMesh()
     {
         if (new_cloud_mesh_recieved_) {
+            ROS_INFO_STREAM("Processing CloudMesh: Cloud size=" << cloud_mesh_.cloud.data.size() << " - Mesh Polygon Size=" << cloud_mesh_.mesh.polygons.size());
             new_cloud_mesh_recieved_ = false;
+
             pcl::PCLPointCloud2 pcl_pc2;
             pcl::PolygonMesh mesh;
             pcl_conversions::toPCL(cloud_mesh_.cloud, pcl_pc2);

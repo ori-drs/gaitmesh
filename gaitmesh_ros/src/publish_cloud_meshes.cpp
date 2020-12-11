@@ -16,7 +16,7 @@
 
 using namespace gaitmesh;
 
-boost::optional<gaitmesh_ros::CloudMesh> loadInitialCloudMesh(ros::NodeHandle nh)
+pcl::PointCloud<pcl::PointXYZ>::Ptr publishInitialCloudMesh(ros::NodeHandle nh, ros::Publisher cloud_mesh_pub)
 {
     // parameters (input)
     bool input_clouds_not_mesh;
@@ -55,7 +55,7 @@ boost::optional<gaitmesh_ros::CloudMesh> loadInitialCloudMesh(ros::NodeHandle nh
         // load and join clouds
         ROS_INFO("Loading clouds...");
         if (cloud_paths.size() == 0)
-            return boost::optional<gaitmesh_ros::CloudMesh>{};
+            return input_cloud;
         for (unsigned int i = 0; i < cloud_paths.size(); i++)
         {
             ROS_INFO("Processing cloud %d", i);
@@ -78,22 +78,23 @@ boost::optional<gaitmesh_ros::CloudMesh> loadInitialCloudMesh(ros::NodeHandle nh
     else
     {
         if (path_mesh == "")
-            return boost::optional<gaitmesh_ros::CloudMesh>{};
+            input_cloud;
         ROS_INFO("Loading mesh...");
         pcl::io::loadPolygonFile(path_mesh, mesh);
         ROS_INFO("Sampling mesh...");
         input_cloud = getCloudFromMesh(mesh, mesh_sampling_resolution);
     }
 
-    gaitmesh_ros::CloudMesh initial_mesh_cloud;
+    gaitmesh_ros::CloudMesh initial_msg;
     pcl::PCLPointCloud2 pcl_pc2;
     pcl::toPCLPointCloud2(*input_cloud, pcl_pc2);
-    pcl_conversions::fromPCL(pcl_pc2, initial_mesh_cloud.cloud);
-    pcl_conversions::fromPCL(mesh, initial_mesh_cloud.mesh);
-    initial_mesh_cloud.reference_point.x = reference_point_x;
-    initial_mesh_cloud.reference_point.y = reference_point_y;
-    initial_mesh_cloud.reference_point.z = reference_point_z;
-    return initial_mesh_cloud;
+    pcl_conversions::fromPCL(pcl_pc2, initial_msg.cloud);
+    pcl_conversions::fromPCL(mesh, initial_msg.mesh);
+    initial_msg.reference_point.x = reference_point_x;
+    initial_msg.reference_point.y = reference_point_y;
+    initial_msg.reference_point.z = reference_point_z;
+    cloud_mesh_pub.publish(initial_msg);
+    return input_cloud;
 }
 
 void cloudCallback(const sensor_msgs::PointCloud2::ConstPtr& cloudMsg, const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& poseMsg, ros::Publisher cloud_mesh_pub, bool* callback_time_elapsed, pcl::PointCloud<pcl::PointXYZ>::Ptr initial_cloud)
@@ -104,8 +105,17 @@ void cloudCallback(const sensor_msgs::PointCloud2::ConstPtr& cloudMsg, const geo
         pcl_conversions::toPCL(*cloudMsg, pcl_pc2);
         pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::fromPCLPointCloud2(pcl_pc2, *input_cloud);
-        int s1 = input_cloud->size();
         *input_cloud += *initial_cloud;
+
+        // TODO: Subsample with VoxelGrid!
+        ROS_WARN_STREAM("Input cloud size: " << input_cloud->size());
+
+        if (input_cloud->size() == 0)
+        {
+            ROS_WARN_STREAM("Input point cloud empty, skipping processing.");
+            return;
+        }
+
         pcl::PolygonMesh mesh = reconstructMeshMeshlab(input_cloud);
 
         gaitmesh_ros::CloudMesh cloud_mesh_msg;
@@ -129,16 +139,9 @@ int main(int argc, char* argv[])
     ros::Publisher cloud_mesh_pub = nh.advertise<gaitmesh_ros::CloudMesh>("/gaitmesh_ros/input_cloud_mesh", 1);
 
     bool callback_time_elapsed = false;
-    ros::Timer timer = nh.createTimer(ros::Duration(5.0), boost::bind(&timerCallback, &callback_time_elapsed));
+    ros::Timer timer = nh.createTimer(ros::Duration(10), boost::bind(&timerCallback, &callback_time_elapsed));
 
-    boost::optional<gaitmesh_ros::CloudMesh> initial_cloud_mesh = loadInitialCloudMesh(nh);
-    pcl::PointCloud<pcl::PointXYZ>::Ptr initial_cloud(new pcl::PointCloud<pcl::PointXYZ>());
-    if (initial_cloud_mesh) {
-        pcl::PCLPointCloud2 pcl_pc2;
-        pcl_conversions::toPCL(initial_cloud_mesh->cloud, pcl_pc2);
-        pcl::fromPCLPointCloud2(pcl_pc2, *initial_cloud);
-        cloud_mesh_pub.publish(*initial_cloud_mesh);
-    }
+    pcl::PointCloud<pcl::PointXYZ>::Ptr initial_cloud = publishInitialCloudMesh(nh, cloud_mesh_pub);
 
     message_filters::Subscriber<sensor_msgs::PointCloud2> cloud_sub(nh, "/icp_odometry/map_cloud", 1);
     message_filters::Subscriber<geometry_msgs::PoseWithCovarianceStamped> pose_sub(nh, "/icp_odometry/corrected_pose", 1);
