@@ -33,7 +33,10 @@ public:
 
     void processCloudMesh()
     {
+        if (!new_cloud_mesh_recieved_) return;
+
         ROS_INFO_STREAM("Processing CloudMesh: Cloud size=" << cloud_mesh_.cloud.data.size() << " - Mesh Polygon Size=" << cloud_mesh_.mesh.polygons.size());
+        new_cloud_mesh_recieved_ = false;
 
         pcl::PCLPointCloud2 pcl_pc2;
         pcl::PolygonMesh mesh;
@@ -70,11 +73,13 @@ protected:
     ros::Subscriber cloud_mesh_sub_;
 
     gaitmesh_ros::CloudMesh cloud_mesh_;  //!< Most recently received CloudMesh - local copy, will be processed in processCloudMesh()
+    bool new_cloud_mesh_recieved_ = false;
 
     void cloudMeshCallback(const gaitmesh_ros::CloudMesh::ConstPtr& msg)
     {
         ROS_INFO("Received mesh - storing internally");
         cloud_mesh_ = *msg;
+        new_cloud_mesh_recieved_ = true;
     }
 };
 

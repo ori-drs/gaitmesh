@@ -1,15 +1,23 @@
 <!DOCTYPE FilterScript>
 <FilterScript>
+ <filter name="Poisson-disk Sampling">
+  <Param type="RichAbsPerc" description="Explicit Radius" tooltip="If not zero this parameter override the previous parameter to allow exact radius specification" name="Radius" value="0.1" max="164.628" min="0"/>
+  <Param type="RichInt" value="20" name="MontecarloRate" tooltip="The over-sampling rate that is used to generate the initial Montecarlo samples (e.g. if this parameter is &lt;i>K&lt;/i> means that&lt;i>K&lt;/i> x &lt;i>poisson sample&lt;/i> points will be used). The generated Poisson-disk samples are a subset of these initial Montecarlo samples. Larger this number slows the process but make it a bit more accurate." description="MonterCarlo OverSampling"/>
+  <Param type="RichBool" value="false" name="ApproximateGeodesicDistance" tooltip="If true Poisson Disc distances are computed using an approximate geodesic distance, e.g. an euclidean distance weighted by a function of the difference between the normals of the two points." description="Approximate Geodesic Distance"/>
+  <Param type="RichBool" value="true" name="Subsample" tooltip="If true the original vertices of the base mesh are used as base set of points. In this case the SampleNum should be obviously much smaller than the original vertex number.&lt;br>Note that this option is very useful in the case you want to subsample a dense point cloud." description="Base Mesh Subsampling"/>
+  <Param type="RichBool" value="false" name="RefineFlag" tooltip="If true the vertices of the below mesh are used as starting vertices, and they will utterly refined by adding more and more points until possible. " description="Refine Existing Samples"/>
+  <Param type="RichMesh" value="0" name="RefineMesh" tooltip="Used only if the above option is checked. " description="Samples to be refined"/>
+ </filter>
  <filter name="Surface Reconstruction: Ball Pivoting">
-  <Param type="RichAbsPerc" description="Pivoting Ball radius (0 autoguess)" value="0.2" min="0" max="23.4974" name="BallRadius" tooltip="The radius of the ball pivoting (rolling) over the set of points. Gaps that are larger than the ball radius will not be filled; similarly the small pits that are smaller than the ball radius will be filled."/>
-  <Param type="RichFloat" description="Clustering radius (% of ball radius)" value="20" name="Clustering" tooltip="To avoid the creation of too small triangles, if a vertex is found too close to a previous one, it is clustered/merged with it."/>
-  <Param type="RichFloat" description="Angle Threshold (degrees)" value="90" name="CreaseThr" tooltip="If we encounter a crease angle that is too large we should stop the ball rolling"/>
-  <Param type="RichBool" description="Delete initial set of faces" value="false" name="DeleteFaces" tooltip="if true all the initial faces of the mesh are deleted and the whole surface is rebuilt from scratch. Otherwise the current faces are used as a starting point. Useful if you run the algorithm multiple times with an increasing ball radius."/>
+  <Param type="RichAbsPerc" description="Pivoting Ball radius (0 autoguess)" tooltip="The radius of the ball pivoting (rolling) over the set of points. Gaps that are larger than the ball radius will not be filled; similarly the small pits that are smaller than the ball radius will be filled." name="BallRadius" value="0.2" max="164.621" min="0"/>
+  <Param type="RichFloat" description="Clustering radius (% of ball radius)" tooltip="To avoid the creation of too small triangles, if a vertex is found too close to a previous one, it is clustered/merged with it." name="Clustering" value="20"/>
+  <Param type="RichFloat" description="Angle Threshold (degrees)" tooltip="If we encounter a crease angle that is too large we should stop the ball rolling" name="CreaseThr" value="90"/>
+  <Param type="RichBool" description="Delete initial set of faces" tooltip="if true all the initial faces of the mesh are deleted and the whole surface is rebuilt from scratch. Otherwise the current faces are used as a starting point. Useful if you run the algorithm multiple times with an increasing ball radius." name="DeleteFaces" value="false"/>
  </filter>
  <filter name="Close Holes">
-  <Param type="RichInt" description="Max size to be closed " value="40" name="MaxHoleSize" tooltip="The size is expressed as number of edges composing the hole boundary"/>
-  <Param type="RichBool" description="Close holes with selected faces" value="false" name="Selected" tooltip="Only the holes with at least one of the boundary faces selected are closed"/>
-  <Param type="RichBool" description="Select the newly created faces" value="true" name="NewFaceSelected" tooltip="After closing a hole the faces that have been created are left selected. Any previous selection is lost. Useful for example for smoothing the newly created holes."/>
-  <Param type="RichBool" description="Prevent creation of selfIntersecting faces" value="true" name="SelfIntersection" tooltip="When closing an holes it tries to prevent the creation of faces that intersect faces adjacent to the boundary of the hole. It is an heuristic, non intersetcting hole filling can be NP-complete."/>
+  <Param type="RichInt" description="Max size to be closed " tooltip="The size is expressed as number of edges composing the hole boundary" name="MaxHoleSize" value="50"/>
+  <Param type="RichBool" description="Close holes with selected faces" tooltip="Only the holes with at least one of the boundary faces selected are closed" name="Selected" value="false"/>
+  <Param type="RichBool" description="Select the newly created faces" tooltip="After closing a hole the faces that have been created are left selected. Any previous selection is lost. Useful for example for smoothing the newly created holes." name="NewFaceSelected" value="true"/>
+  <Param type="RichBool" description="Prevent creation of selfIntersecting faces" tooltip="When closing an holes it tries to prevent the creation of faces that intersect faces adjacent to the boundary of the hole. It is an heuristic, non intersetcting hole filling can be NP-complete." name="SelfIntersection" value="true"/>
  </filter>
 </FilterScript>
