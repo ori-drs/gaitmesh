@@ -85,11 +85,18 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
                                 pcl::PointCloud<pcl::PointNormal>::Ptr normal_cloud,
                                 pcl::PointCloud<pcl::PointXYZRGBNormal>::Ptr gait_cloud)
 {
+    // Check if the cloud is empty - if it is, return:
+    if (input_cloud->size() == 0)
+    {
+        ROS_WARN_STREAM("Input cloud is empty - not running annotation. Cloud size = " << input_cloud->size() << ", Mesh #Polygons = " << mesh.polygons.size());
+        return std::vector<char>();
+    }
+
     // Step 2: Outlier filter
     // if (!outlier_removal_cloud) outlier_removal_cloud.reset(new pcl::PointCloud<pcl::PointXYZ>());
     if (false)
     {
-        ROS_INFO("Removing outliers...");
+        ROS_DEBUG("Removing outliers...");
         pcl::RadiusOutlierRemoval<pcl::PointXYZ> sor;
         sor.setInputCloud(input_cloud);
         sor.setRadiusSearch(0.2);
@@ -104,7 +111,7 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
     // Step 3: Run terrain-related filters
     // if (!normal_cloud) normal_cloud.reset(new pcl::PointCloud<pcl::PointNormal>());
     {
-        ROS_INFO("Estimating normals...");
+        ROS_DEBUG("Estimating normals...");
         const float radius = radius_normals;
         pcl::NormalEstimationOMP<pcl::PointXYZ, pcl::Normal> ne;
         ne.setInputCloud(input_cloud);
@@ -119,7 +126,7 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
     // Step 4: Gait annotation
     // if (!gait_cloud) gait_cloud.reset(new pcl::PointCloud<pcl::PointXYZRGBNormal>());
     {
-        ROS_INFO("Running filters...");
+        ROS_DEBUG("Running filters...");
         const float radius = radius_robot;
         gait_cloud->points.reserve(normal_cloud->points.size());
         pcl::search::KdTree<pcl::PointNormal>::Ptr tree(new pcl::search::KdTree<pcl::PointNormal>());
@@ -161,47 +168,17 @@ std::vector<char> annotateCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud,
 
     // back-project features to mesh
     std::vector<char> mesh_labels(mesh.polygons.size(), (char)0);
-    if (false)
     {
-        ROS_INFO("Back-projecting annotations to mesh...");
+        ROS_DEBUG("Back-projecting annotations to mesh...");
         // tree
         pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZRGBNormal>());
         tree->setInputCloud(gait_cloud);
         // go through all mesh triangles
         pcl::PointCloud<pcl::PointXYZRGBNormal> mesh_cloud;
+        // This line is expected to throw warnings - thus disable them:
+        pcl::console::setVerbosityLevel(pcl::console::L_ALWAYS);
         pcl::fromPCLPointCloud2(mesh.cloud, mesh_cloud);
-        for (int i = 0; i < mesh.polygons.size(); i++)
-        {
-            // get closest annotated-cloud point
-            Eigen::Vector3d v0 = pcl2eig(mesh_cloud.points[mesh.polygons[i].vertices[0]]);
-            Eigen::Vector3d v1 = pcl2eig(mesh_cloud.points[mesh.polygons[i].vertices[1]]);
-            Eigen::Vector3d v2 = pcl2eig(mesh_cloud.points[mesh.polygons[i].vertices[2]]);
-            Eigen::Vector3d vc = (v0 + v1 + v2) / 3;
-            pcl::PointXYZRGBNormal pt_center = eig2pcl(vc);
-            std::vector<int> k_indices;
-            std::vector<float> k_distances;
-            tree->nearestKSearch(pt_center, 1, k_indices, k_distances);
-            // assign label to triangle
-            const pcl::PointXYZRGBNormal& nn = gait_cloud->points[k_indices[0]];
-            char label = 2;
-            if (nn.g > 0)
-                label = 1;  // trot
-            else if (nn.b > 0)
-                label = 2;  // step
-            else
-                label = 0;  // unwalkable
-            mesh_labels[i] = label;
-        }
-    }
-    else
-    {
-        ROS_INFO("Back-projecting annotations to mesh...");
-        // tree
-        pcl::search::KdTree<pcl::PointXYZRGBNormal>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZRGBNormal>());
-        tree->setInputCloud(gait_cloud);
-        // go through all mesh triangles
-        pcl::PointCloud<pcl::PointXYZRGBNormal> mesh_cloud;
-        pcl::fromPCLPointCloud2(mesh.cloud, mesh_cloud);
+        pcl::console::setVerbosityLevel(pcl::console::L_WARN);  // Re-enable
         for (int i = 0; i < mesh.polygons.size(); i++)
         {
             // we will vote for each of the gait-controller options
