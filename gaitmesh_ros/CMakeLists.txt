@@ -60,6 +60,7 @@ add_library(${PROJECT_NAME}
   src/lvr2_reconstruction.cpp     # Las Vegas Reconstruction
   src/meshlab_reconstruction.cpp  # Meshlab Reconstruction
   src/pcl/PclMeshSampling.cpp     # Modified copy of PCL's mesh sampling methods
+  src/pcl/vtk_lib_io.cpp          # Modified copy of PCL's VTK IO to work around Anybotics packaging issues
 )
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES} ${catkin_LIBRARIES})
