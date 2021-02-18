@@ -6,7 +6,7 @@
 #include <sensor_msgs/PointCloud2.h>
 
 #include "pcl/PclMeshSampling.h"  // Local copy
-#include "pcl/vtk_lib_io.h"  // Local copy
+#include "pcl/vtk_lib_io.h"       // Local copy
 
 #include <pcl/PolygonMesh.h>
 #include <pcl/TextureMesh.h>
