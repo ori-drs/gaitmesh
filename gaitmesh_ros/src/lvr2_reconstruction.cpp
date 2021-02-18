@@ -4,7 +4,8 @@
 #include <ros/ros.h>
 
 #include <pcl/io/ply_io.h>
-#include <pcl/io/vtk_lib_io.h>  // for loadPolygonFilePLY
+// #include <pcl/io/vtk_lib_io.h>  // for loadPolygonFilePLY
+#include "pcl/vtk_lib_io.h"
 
 #include <gaitmesh_ros/lvr2_reconstruction.hpp>
 

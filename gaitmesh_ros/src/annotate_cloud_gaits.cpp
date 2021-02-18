@@ -6,13 +6,13 @@
 #include <sensor_msgs/PointCloud2.h>
 
 #include "pcl/PclMeshSampling.h"  // Local copy
+#include "pcl/vtk_lib_io.h"       // Local copy
 
 #include <pcl/PolygonMesh.h>
 #include <pcl/TextureMesh.h>
 #include <pcl/io/auto_io.h>
 #include <pcl/io/obj_io.h>
 #include <pcl/io/ply_io.h>
-#include <pcl/io/vtk_lib_io.h>
 
 #include <gaitmesh_ros/common.hpp>
 #include <gaitmesh_ros/gaitmesh_ros.hpp>
